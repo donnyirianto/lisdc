@@ -8,13 +8,13 @@ async function query(query, param) {
 
   return result
 }
-async function execute(query) {
-  const result = await conn.execute(query)
+async function insert(query) {
+  const result = await conn.query(query)
 
   return result
 
 }
 
 module.exports = {
-  query, execute
+  query, insert
 }

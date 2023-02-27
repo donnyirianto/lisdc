@@ -1,7 +1,8 @@
 const Models = require('../Models/model');  
 const logger = require('../utils/logger');
-const path = require('path');
-const downloadPath = path.resolve('../download');
+const readData = require('../helpers/readdata');
+const dayjs = require('dayjs');
+
 
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -13,23 +14,21 @@ const getServer = async () => {
         return result
     
     }catch(e){
-        console.log(e)
+        logger.warn(e)
         return "Error"
     }
 }   
  
 const doitBro = async (browser,r) => { 
-    const kdcab = r.dc_kode
-   
-	logger.info("Start : " + kdcab )  
+    
+    const kdcab = r.dc_kode  
 	const page = await browser.newPage()
-    try {  
-        
+    try {   
+        await page.setViewport({
+            width: 1920, // replace with your desired width
+            height: 1080, // replace with your desired height
+          });
         await page.setDefaultNavigationTimeout(0); 
-        await page._client.send('Page.setDownloadBehavior', {
-            behavior: 'allow',
-            downloadPath: '/home/donny/' 
-        });
         await page.goto(`http://${r.address}`,{
             waitUntil: 'networkidle0'
         });
@@ -40,48 +39,55 @@ const doitBro = async (browser,r) => {
         await page.keyboard.type( `${r.pass}`);  
         
         await page.click("button[type=submit]");  
-        await page.waitForNavigation({
-            waitUntil: 'networkidle2',
-          });  
+        await page.waitForTimeout(500)
         
-        await page.goto(`http://${r.address}/Warehousing/MONTRANSDATAVIAWEB?log_menu=EXTERNAL%2FEDP&log_title=LAPORAN%20MONITORING%20TRANSFER%20DATA%20VIA%20WEBSERVICE&log_class=MONTRANSDATAVIAWEB`,
-        {    
-            waitUntil: 'networkidle0'
-        });
+        const NPB = await readData.read(browser,r.address, "NPB").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
+        const NPR = await readData.read(browser,r.address, "NPR").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
+        const NPX = await readData.read(browser,r.address, "NPX").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
+        const NPV = await readData.read(browser,r.address, "NPV").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
+        const ALOKASI = await readData.read(browser,r.address, "NPL").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
         
-        await page.select('select.selectpicker', 'NPB');        
-        await page.waitForTimeout(100)
-        await page.waitForSelector("#startdate"); 
-        await page.type("#startdate", `02/24/2023 00:00:00`);
-        await page.waitForTimeout(100)
-        await page.waitForSelector("#enddate"); 
-        await page.type("#enddate", `02/24/2023 00:00:00`);
-        await page.waitForTimeout(1000)
-          
-        //   await page.keyboard.down("Tab");
-        //   await page.waitFor(1000)
-        //   await page.keyboard.down("25");await page.keyboard.down("25")
-        //   await page.keyboard.press("Enter")
-        await page.click("input[type=submit]");
-        await page.waitForTimeout(2000)
-        await page.goto(`http://${r.address}/ReportViewerWebForm.aspx`,
-        {    
-            waitUntil: 'networkidle0'
-        });
-       
-        await page.waitForSelector("#ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown");
-        await page.click("#ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown");
-        await page.keyboard.press("Enter")
-        await page.waitForTimeout(20000)
-        logger.info("Sukses") 
+        let dataLis = NPB.concat(NPR,NPV,NPX,ALOKASI)
 
-        logger.info("Finish : " +kdcab)
-		await page.close();		 
+        dataLis = dataLis.map((r)=>{
+            return [
+                dayjs(r.tanggal).format("YYYY-MM-DD"),
+                kdcab,
+                r.jenis, 
+                r.toko,
+                r.namaToko,
+                r.namafile,
+                r.jamWeb,
+                r.jamCsv.substr(0,80),
+                r.jamKirim.substr(0,80),
+                r.jamKonfirm.substr(0,80),
+                r.jamToko,
+                (typeof r.docno === "undefined") ? '' : r.docno,
+                (typeof r.jmlItem === "undefined") ? '' : r.jmlItem,
+                r.jamBpb,
+                (typeof r.bukti_no === "undefined") ? '' : r.bukti_no,
+                (typeof r.jmlBpb === "undefined") ? '' : r.jmlBpb,
+                dayjs().format("YYYY-MM-DD HH:mm:ss")
+            ]
+        })
+        await page.close();
+
+        await Models.insertData(dataLis)
+        console.log({
+            status: "OK",
+            msg : `${kdcab} - Sukses Update Data`
+        })
+        return {
+            status: "OK",
+            msg : `${kdcab} - Sukses Update Data`
+        }
     } catch (error) {
-      //console.log("ERror : " +kdcab)  
-      console.warn("Error : " + error )     
-	  await page.close();		
-    
+        
+        await page.close();		
+        return {
+            status: "NOK",
+            msg : `${kdcab} - Gagal :: ${error}`
+        }
     }  
 }
  

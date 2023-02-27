@@ -12,23 +12,48 @@ logger.info("[SERVICE START] Service Cek PBRO Region 4 : " + dayjs().format("YYY
   if (taskRunning) { 
       taskRunning = false    
       try {  
-		  taskRunning = false      
-          let today = dayjs().format("YYYY-MM-DD")               
+		      taskRunning = false                        
           logger.info("Memulai Menjalankan Pengecekan LISDC :: " +  dayjs().format("YYYY-MM-DD HH:mm:ss"))
-            const server = await Controller.getServer() 
-            
-            
-            const browser = await puppeteer.launch({headless : false, args: ["--no-sandbox", "--disable-setuid-sandbox"] })
-            const pid = browser.process().pid;
+            const server = await Controller.getServer()  
 
-            for(const r of server){ 
-              await Controller.doitBro(browser,r) 
-            }
+            // for(const r of server){ 
+            //   const browser = await puppeteer.launch({headless : false, 
+            //     args: ["--no-sandbox", "--disable-setuid-sandbox"]
+            //   })
+              
+            //   const pid = browser.process().pid;
 
-            await browser.close();
-            exec('kill -9 ' + pid, (error, stdout, stderr) => {});
+            //   const a = await Controller.doitBro(browser,r) 
+            //   console.log(a)
+            //   await browser.close();
+            //   exec('kill -9 ' + pid, (error, stdout, stderr) => {});    
+            // } 
+
+            const allPromises = [];
+
+            for (let r of server) {
+                const promise = new Promise(async (res, rej) => {
+
+                  const browser = await puppeteer.launch({headless : false, 
+                    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+                  })
+                  
+                  const pid = browser.process().pid;
+    
+                  await Controller.doitBro(browser,r) 
+                  
+                  await browser.close();
+                  exec('kill -9 ' + pid, (error, stdout, stderr) => {});   
+                });
+                allPromises.push(promise);
+            };
             
-			 
+            const outcomes = await Promise.allSettled(allPromises);
+            const succeeded = outcomes.filter(o => o.status === "fulfilled");
+            
+            const hasil = succeeded.map(f => f.value);
+            console.log(hasil)
+            
             logger.info("[END] Pengecekan LISDC : " +  dayjs().format("YYYY-MM-DD HH:mm:ss") )
           taskRunning = true
       } catch (err) {
