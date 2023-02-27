@@ -7,10 +7,10 @@ const dayjs = require('dayjs');
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 } 
-const getServer = async () => {
+const getServer = async (a,b) => {
     try{  
 
-        const result = await Models.dataServer()      
+        const result = await Models.dataServer(a,b)      
         return result
     
     }catch(e){
