@@ -1,4 +1,0 @@
-{"level":20,"time":1677489421064,"pid":3354988,"hostname":"dia","msg":"[SERVICE START] Service Cek PBRO Region 4 : 2023-02-27 16:17:01"}
-{"level":20,"time":1677489421065,"pid":3354988,"hostname":"dia","msg":"Memulai Menjalankan Pengecekan LISDC :: 2023-02-27 16:17:01"}
-{ status: 'OK', msg: 'G067 - Sukses Update Data' }
-{ status: 'OK', msg: 'G004 - Sukses Update Data' }
