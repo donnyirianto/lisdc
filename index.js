@@ -11,19 +11,18 @@ const myPromise = async(a,b)=>{
  
   const allPromises = [];
 
-  for (let r of server.slice(0,10)) {
+  for (let r of server) {
       const promise = new Promise(async (res, rej) => {
-        act(r)                   
+        act(r)
+          .then((val) => { res(val)})
+          .catch((e) => { rej(e) })
       });
       allPromises.push(promise);
   }; 
   
-  const outcomes = await Promise.allSettled(allPromises);
-  const succeeded = outcomes.filter(o => o.status === "fulfilled");
+  await Promise.allSettled(allPromises);
   
-  const hasil = succeeded.map(f => f.value);
-
-  console.log(hasil)
+  logger.info(`Job ${a}-${a+b} Done :: ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`)
 }
 
 const act = async (r)=>{
@@ -40,8 +39,8 @@ const act = async (r)=>{
 }
 
 logger.info("[SERVICE START] Service Cek PBRO Region 4 : " + dayjs().format("YYYY-MM-DD HH:mm:ss") );
-//cron.schedule('*/1 * * * *', async() => { 
-( async() => {   
+cron.schedule('*/55 * * * *', async() => { 
+//( async() => {   
   if (taskRunning) { 
       taskRunning = false    
       try {  
@@ -51,7 +50,7 @@ logger.info("[SERVICE START] Service Cek PBRO Region 4 : " + dayjs().format("YYY
           await myPromise(0,5)
           await myPromise(5,5)
           await myPromise(10,5)
-          await myPromise(15,5)
+          await myPromise(15,5)          
           await myPromise(20,5)
           await myPromise(25,5)
           await myPromise(30,5)
@@ -78,4 +77,4 @@ logger.info("[SERVICE START] Service Cek PBRO Region 4 : " + dayjs().format("YYY
       }
   }
 
-})();
+});

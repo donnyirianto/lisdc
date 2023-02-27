@@ -73,7 +73,7 @@ const doitBro = async (browser,r) => {
         await page.close();
 
         await Models.insertData(dataLis)
-        console.log({
+        logger.info({
             status: "OK",
             msg : `${kdcab} - Sukses Update Data`
         })
@@ -82,7 +82,10 @@ const doitBro = async (browser,r) => {
             msg : `${kdcab} - Sukses Update Data`
         }
     } catch (error) {
-        
+        logger.warn({
+            status: "NOK",
+            msg : `${kdcab} - Gagal :: ${error}`
+        })
         await page.close();		
         return {
             status: "NOK",

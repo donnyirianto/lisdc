@@ -12,7 +12,6 @@ const dataServer = async (a,b) => {
         `)
         return rows
     }catch(e){
-        console.log(e)
         return "Error"
     }
 } 
@@ -26,7 +25,7 @@ const insertData = async (data) => {
         
         return "Sukses"
     }catch(e){
-        throw new Error(e);
+        return "Error"
     }
 }
   
