@@ -8,7 +8,14 @@ let taskRunning = true
 
 logger.info("[SERVICE START] Service Cek LISDC : " + dayjs().format("YYYY-MM-DD HH:mm:ss") );
 
-const myPromise = async(browser,a,b)=>{
+const myPromise = async(a,b)=>{
+
+  const browser = await puppeteer.launch({headless : true, 
+            args: ["--no-sandbox", "--disable-setuid-sandbox"]
+          })
+          
+  const pid = browser.process().pid;
+
   const server = await Controller.getServer(a,b)  
  
   const allPromises = [];
@@ -25,6 +32,8 @@ const myPromise = async(browser,a,b)=>{
   await Promise.allSettled(allPromises);
   
   logger.info(`Job ${a}-${a+b} Done :: ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`)
+  await browser.close();
+  exec('kill -9 ' + pid, (error, stdout, stderr) => {});   
 } 
 
 cron.schedule('*/55 * * * *', async() => { 
@@ -34,23 +43,12 @@ cron.schedule('*/55 * * * *', async() => {
       try {  
 		      taskRunning = false                        
           logger.info("Memulai Menjalankan Pengecekan LISDC :: " +  dayjs().format("YYYY-MM-DD HH:mm:ss"))
-          
-          const browser = await puppeteer.launch({headless : true, 
-            args: ["--no-sandbox", "--disable-setuid-sandbox"]
-          })
-          
-          const pid = browser.process().pid;
 
-          await myPromise(browser,0,20)
-          await myPromise(browser,20,20)
-          await myPromise(browser,40,20)
-          await myPromise(browser,60,20)
-          await myPromise(browser,80,20)
-          await myPromise(browser,100,20) 
-
-          await browser.close();
-          exec('kill -9 ' + pid, (error, stdout, stderr) => {});   
-            
+          await myPromise(0,30) 
+          await myPromise(30,30)
+          await myPromise(60,30)
+          await myPromise(90,30)
+                      
           logger.info("[END] Pengecekan LISDC : " +  dayjs().format("YYYY-MM-DD HH:mm:ss") )
           taskRunning = true
       } catch (err) {
