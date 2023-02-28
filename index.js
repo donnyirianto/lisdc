@@ -5,15 +5,17 @@ const Controller = require('./controller/controller');
 const dayjs = require("dayjs"); 
 const puppeteer = require("puppeteer");
 let taskRunning = true 
-  
-const myPromise = async(a,b)=>{
+
+logger.info("[SERVICE START] Service Cek LISDC : " + dayjs().format("YYYY-MM-DD HH:mm:ss") );
+
+const myPromise = async(browser,a,b)=>{
   const server = await Controller.getServer(a,b)  
  
   const allPromises = [];
 
   for (let r of server) {
       const promise = new Promise(async (res, rej) => {
-        act(r)
+        Controller.doitBro(browser,r) 
           .then((val) => { res(val)})
           .catch((e) => { rej(e) })
       });
@@ -23,22 +25,8 @@ const myPromise = async(a,b)=>{
   await Promise.allSettled(allPromises);
   
   logger.info(`Job ${a}-${a+b} Done :: ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`)
-}
+} 
 
-const act = async (r)=>{
-  const browser = await puppeteer.launch({headless : true, 
-    args: ["--no-sandbox", "--disable-setuid-sandbox"]
-  })
-  
-  const pid = browser.process().pid;
-
-  await Controller.doitBro(browser,r) 
-  
-  await browser.close();
-  exec('kill -9 ' + pid, (error, stdout, stderr) => {});  
-}
-
-logger.info("[SERVICE START] Service Cek PBRO Region 4 : " + dayjs().format("YYYY-MM-DD HH:mm:ss") );
 cron.schedule('*/55 * * * *', async() => { 
 //( async() => {   
   if (taskRunning) { 
@@ -46,28 +34,22 @@ cron.schedule('*/55 * * * *', async() => {
       try {  
 		      taskRunning = false                        
           logger.info("Memulai Menjalankan Pengecekan LISDC :: " +  dayjs().format("YYYY-MM-DD HH:mm:ss"))
-            
-          await myPromise(0,5)
-          await myPromise(5,5)
-          await myPromise(10,5)
-          await myPromise(15,5)          
-          await myPromise(20,5)
-          await myPromise(25,5)
-          await myPromise(30,5)
-          await myPromise(35,5)
-          await myPromise(40,5)
-          await myPromise(45,5)
-          await myPromise(50,5)
-          await myPromise(55,5)
-          await myPromise(60,5)
-          await myPromise(65,5)
-          await myPromise(70,5)
-          await myPromise(75,5)
-          await myPromise(80,5)
-          await myPromise(85,5)
-          await myPromise(90,5)
-          await myPromise(95,5)
-          await myPromise(100,6)
+          
+          const browser = await puppeteer.launch({headless : true, 
+            args: ["--no-sandbox", "--disable-setuid-sandbox"]
+          })
+          
+          const pid = browser.process().pid;
+
+          await myPromise(browser,0,20)
+          await myPromise(browser,20,20)
+          await myPromise(browser,40,20)
+          await myPromise(browser,60,20)
+          await myPromise(browser,80,20)
+          await myPromise(browser,100,20) 
+
+          await browser.close();
+          exec('kill -9 ' + pid, (error, stdout, stderr) => {});   
             
           logger.info("[END] Pengecekan LISDC : " +  dayjs().format("YYYY-MM-DD HH:mm:ss") )
           taskRunning = true
