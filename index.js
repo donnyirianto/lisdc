@@ -43,7 +43,7 @@ cron.schedule('*/55 * * * *', async() => {
       try {  
 		      taskRunning = false                        
           logger.info("Memulai Menjalankan Pengecekan LISDC :: " +  dayjs().format("YYYY-MM-DD HH:mm:ss"))
-
+          
           await myPromise(0,30) 
           await myPromise(30,30)
           await myPromise(60,30)

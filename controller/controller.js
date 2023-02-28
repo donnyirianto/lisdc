@@ -71,7 +71,6 @@ const doitBro = async (browser,r) => {
             ]
         })
         await page.close();
-
         await Models.insertData(dataLis)
         logger.info({
             status: "OK",
