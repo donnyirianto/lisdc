@@ -5,8 +5,7 @@ const sleep = (milliseconds) => {
 }
 
 const read = async (browser,kdcab,address,jenis)=>{
-    try {
-        
+    try {        
         const page = await browser.newPage()   
         await page.setViewport({
             width: 1920, // replace with your desired width
@@ -20,7 +19,7 @@ const read = async (browser,kdcab,address,jenis)=>{
         await page.waitForSelector("select.selectpicker");
         await page.select('select.selectpicker', jenis);  
         await page.waitForSelector("#startdate"); 
-        await page.type("#startdate", `${dayjs().subtract(1, 'day').format("MM")}/${dayjs().subtract(1, 'day').format("DD")}/${dayjs().subtract(1, 'day').format("YYYY")} 00:00:00`);
+        await page.type("#startdate", `${dayjs().subtract(6, 'day').format("MM")}/${dayjs().subtract(6, 'day').format("DD")}/${dayjs().subtract(6, 'day').format("YYYY")} 00:00:00`);
         await page.waitForSelector("#enddate"); 
         await page.type("#enddate", `${dayjs().format("MM")}/${dayjs().format("DD")}/${dayjs().format("YYYY")} 23:59:59`);
         await page.click("input[type=submit]");
