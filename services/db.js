@@ -10,9 +10,7 @@ async function query(query, param) {
 }
 async function insert(query) {
   const result = await conn.query(query)
-
   return result
-
 }
 
 module.exports = {

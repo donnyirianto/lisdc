@@ -10,7 +10,7 @@ logger.info("[SERVICE START] Service Cek LISDC : " + dayjs().format("YYYY-MM-DD 
 
 const myPromise = async(a,b)=>{
 
-  const browser = await puppeteer.launch({headless : true, 
+  const browser = await puppeteer.launch({headless : false, 
             args: ["--no-sandbox", "--disable-setuid-sandbox"]
           })
           

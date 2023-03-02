@@ -1,8 +1,6 @@
 const Models = require('../Models/model');  
 const logger = require('../utils/logger');
 const readData = require('../helpers/readdata');
-const dayjs = require('dayjs');
-
 
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -41,37 +39,25 @@ const doitBro = async (browser,r) => {
         await page.click("button[type=submit]");  
         await page.waitForTimeout(500)
         
-        const NPB = await readData.read(browser,r.address, "NPB").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
-        const NPR = await readData.read(browser,r.address, "NPR").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
-        const NPX = await readData.read(browser,r.address, "NPX").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
-        const NPV = await readData.read(browser,r.address, "NPV").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
-        const ALOKASI = await readData.read(browser,r.address, "NPL").then(r=>{return r.status === "OK" ? r.data : []}).catch(()=>{return []})
+        //const allPromises = [];
+        //,"NPR","NPX","NPV","NPL"
+        const selectLisNP = ["NPB","NPR","NPX","NPV","NPL"]
+        for (let u of selectLisNP) {
+            // const promise = new Promise(async (res, rej) => {
+                await readData.read(browser,kdcab,r.address, u)
+                .then(async (r)=>{
+                    if(r.status === "OK" && r.data.length > 0)
+                        await Models.insertData(r.data)
+                    return "OK"
+                })
+                .catch(()=>{return "NOK"})
+            //});
+            //allPromises.push(promise);
+        }; 
         
-        let dataLis = NPB.concat(NPR,NPV,NPX,ALOKASI)
+        //await Promise.allSettled(allPromises);
+        await page.close(); 
 
-        dataLis = dataLis.map((r)=>{
-            return [
-                dayjs(r.tanggal).format("YYYY-MM-DD"),
-                kdcab,
-                r.jenis, 
-                r.toko,
-                r.namaToko,
-                r.namafile,
-                r.jamWeb,
-                r.jamCsv.substr(0,80),
-                r.jamKirim.substr(0,80),
-                r.jamKonfirm.substr(0,80),
-                r.jamToko,
-                (typeof r.docno === "undefined") ? '' : r.docno,
-                (typeof r.jmlItem === "undefined") ? '' : r.jmlItem,
-                r.jamBpb,
-                (typeof r.bukti_no === "undefined") ? '' : r.bukti_no,
-                (typeof r.jmlBpb === "undefined") ? '' : r.jmlBpb,
-                dayjs().format("YYYY-MM-DD HH:mm:ss")
-            ]
-        })
-        await page.close();
-        await Models.insertData(dataLis)
         logger.info({
             status: "OK",
             msg : `${kdcab} - Sukses Update Data`

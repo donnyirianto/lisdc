@@ -3,8 +3,7 @@ const conn = require('../services/db');
 
 const dataServer = async (a,b) => {
     try{
-        //
-            //and kdcab IN('G004','G025','G030','G034','G097','G146','G148','G149','G158','G177','G301','G305')
+       
         const rows = await conn.query(`
         SELECT dc_induk,dc_kode,jenis_dc,nama,ip,address,username,pass,reg FROM m_server_lis
         order by dc_induk,dc_kode
@@ -25,6 +24,7 @@ const insertData = async (data) => {
         
         return "Sukses"
     }catch(e){
+        console.log(e)
         return "Error"
     }
 }

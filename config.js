@@ -8,7 +8,7 @@ const config = {
     database: process.env.DB_NAME || 'iris',
     port: process.env.DB_PORT || '3306',
     waitForConnections: true,
-    connectionLimit: 3 ,
+    connectionLimit: 5 ,
     queueLimit: 0,
     dateStrings:true,
     multipleStatements: true

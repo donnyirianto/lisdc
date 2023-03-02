@@ -4,7 +4,7 @@ const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-const read = async (browser,address,jenis)=>{
+const read = async (browser,kdcab,address,jenis)=>{
     try {
         
         const page = await browser.newPage()   
@@ -20,7 +20,7 @@ const read = async (browser,address,jenis)=>{
         await page.waitForSelector("select.selectpicker");
         await page.select('select.selectpicker', jenis);  
         await page.waitForSelector("#startdate"); 
-        await page.type("#startdate", `${dayjs().subtract(7, 'day').format("MM")}/${dayjs().subtract(7, 'day').format("DD")}/${dayjs().subtract(7, 'day').format("YYYY")} 00:00:00`);
+        await page.type("#startdate", `${dayjs().subtract(1, 'day').format("MM")}/${dayjs().subtract(1, 'day').format("DD")}/${dayjs().subtract(1, 'day').format("YYYY")} 00:00:00`);
         await page.waitForSelector("#enddate"); 
         await page.type("#enddate", `${dayjs().format("MM")}/${dayjs().format("DD")}/${dayjs().format("YYYY")} 23:59:59`);
         await page.click("input[type=submit]");
@@ -37,10 +37,10 @@ const read = async (browser,address,jenis)=>{
                 const dataNodeList = tr.querySelectorAll('td');
                 const dataArray = Array.from(dataNodeList);
                 const [tanggal,jenis, toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb] = dataArray.map(td => td.textContent.replace(/;/g, ''));
-                //tangal : tanggal.replace(new RegExp(/-/g), "/"),
+                
                 return {
-                    tangal : tanggal.replace(new RegExp(/-/g), "/"),
-                    jenis, toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,
+                    tanggal,jenis, toko,namaToko,namafile,jamWeb,
+                    jamCsv,jamKirim,jamKonfirm,jamToko,
                     docno,jmlItem,jamBpb,bukti_no,jmlBpb
                 };
             })
@@ -49,8 +49,9 @@ const read = async (browser,address,jenis)=>{
         for(let i = 2; i < 100; i += 1){            
             try {                
                 await page.waitForSelector("span#ReportViewer1_ctl09_ctl00_Next_ctl00_ctl00")
+                await sleep(1000)
                 await page.click("span#ReportViewer1_ctl09_ctl00_Next_ctl00_ctl00")   
-                await sleep(500) 
+                await sleep(1000)
                 const dataPerPage = await page.evaluate(() => {
                     const x = document.querySelectorAll('table')[27]
                     const trs = Array.from(x.querySelectorAll('table tr'))
@@ -60,21 +61,40 @@ const read = async (browser,address,jenis)=>{
                         const [tanggal,jenis, toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb] = dataArray.map(td => td.textContent.replace(/;/g, ''));
                         
                         return {
-                            tangal : tanggal.replace(new RegExp(/-/g), "/"),
-                            jenis, toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,
+                            tanggal,jenis, toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,
                             docno,jmlItem,jamBpb,bukti_no,jmlBpb
                         };
                     })
                 });   
                 dataSource = [...dataSource, ...dataPerPage];
                 await sleep(500)               
-            } catch (e) {            
+            } catch (e) {      
                 break;
             } 
         }
-        
-        const hasil = [...dataLis, ...dataSource]
-        
+        await page.close(); 
+        let hasil = [...dataLis, ...dataSource]
+            hasil = hasil.map((r)=>{
+                return [
+                    r.tanggal,
+                    kdcab,
+                    r.jenis, 
+                    r.toko,
+                    r.namaToko,
+                    r.namafile,
+                    r.jamWeb,
+                    r.jamCsv.substring(0,80),
+                    r.jamKirim.substring(0,80),
+                    r.jamKonfirm.substring(0,80),
+                    r.jamToko,
+                    (typeof r.docno === "undefined") ? '' : r.docno,
+                    (typeof r.jmlItem === "undefined") ? '' : r.jmlItem,
+                    r.jamBpb,
+                    (typeof r.bukti_no === "undefined") ? '' : r.bukti_no,
+                    (typeof r.jmlBpb === "undefined") ? '' : r.jmlBpb,
+                    dayjs().format("YYYY-MM-DD HH:mm:ss")
+                ]
+            })            
         return {
             status: "OK",
             data: hasil
