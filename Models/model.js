@@ -15,13 +15,17 @@ const dataServer = async (a,b) => {
     }
 } 
  
-const insertData = async (data) => {
+const insertData = async (data,jenis,tgl_start,tgl_end) => {
     try{
-        
+        await conn.insert(`Delete from m_npdc where dc='${dc}' and 
+        jenis='${jenis}' 
+        and STR_TO_DATE(tanggal,'%d-%m-%Y') between '${tgl_start}' and '${tgl_end}';`)
+
         const queryInsert = `REPLACE INTO m_npdc (tanggal,dc,jenis,toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb,lastupd) values ?`
         
-        await conn.insert(  {sql: queryInsert, values: [data]})
-        
+        await conn.insert(  {sql: queryInsert, values: [data]}) 
+
+        console.log("Sukses Insert")
         return "Sukses"
     }catch(e){
         console.log(e)
@@ -29,6 +33,17 @@ const insertData = async (data) => {
     }
 }
   
+const updateRekap = async (data,jenis,tgl_start,tgl_end) => {
+    try{
+        await conn.insert(`update m_npdc_rekap set cek_npb_d = 0 where namafile not in(select namafile from m_npdc);`)        
+
+        console.log("Sukses Insert")
+        return "Sukses"
+    }catch(e){
+        console.log(e)
+        return "Error"
+    }
+}
 module.exports = {
-    dataServer,insertData
+    dataServer,insertData,updateRekap
   }
