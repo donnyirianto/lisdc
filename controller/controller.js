@@ -45,25 +45,25 @@ const doitBro = async (browser,r,jenis) => {
         let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
         if (!fs.existsSync(folder)) {
             fs.mkdirSync(folder,{ recursive: true });
-            }
-            await readData.read(browser,kdcab,r.address, jenis)
-            .then(async (r)=>{
-                if(r.status === "OK" && r.data.length > 0)
-                    
-                    await Models.insertData(r.data,kdcab,jenis,tgl_start,tgl_end)
-                return "OK"
-            })
-            .catch((e)=>{return e})
+        }
+        const updatedata = await readData.read(browser,kdcab,r.address, jenis)
+        .then(async (r)=>{
+            if(r.status === "OK" && r.data.length > 0)
+                
+                await Models.insertData(r.data,kdcab,jenis,tgl_start,tgl_end)
+            return r.data.length
+        })
+        .catch((e)=>{return e})
              
         await page.close(); 
 
         logger.info({
             status: "OK",
-            msg : `${kdcab} - Sukses Update Data`
+            msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
         })
         return {
             status: "OK",
-            msg : `${kdcab} - Sukses Update Data`
+            msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
         }
     } catch (error) {
         logger.warn({
