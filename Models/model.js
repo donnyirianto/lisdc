@@ -15,11 +15,13 @@ const dataServer = async (a,b) => {
     }
 } 
  
-const insertData = async (data,jenis,tgl_start,tgl_end) => {
+const insertData = async (data,dc,jenis,tgl_start,tgl_end) => {
     try{
+    	/*
         await conn.insert(`Delete from m_npdc where dc='${dc}' and 
         jenis='${jenis}' 
         and STR_TO_DATE(tanggal,'%d-%m-%Y') between '${tgl_start}' and '${tgl_end}';`)
+        */
 
         const queryInsert = `REPLACE INTO m_npdc (tanggal,dc,jenis,toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb,lastupd) values ?`
         

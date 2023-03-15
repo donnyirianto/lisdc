@@ -49,7 +49,7 @@ const read = async (browser,kdcab,address,jenis)=>{
         const workbook = XLSX.readFile(newPath);
         const sheetNames = workbook.SheetNames;
         const worksheet = workbook.Sheets[sheetNames[0]];
-        let data = XLSX.utils.sheet_to_json(worksheet)
+        let data = XLSX.utils.sheet_to_json(worksheet).filter(r => r.__EMPTY_2 === jenis)
         let hasil =[]
         if(jenis !="NPV"){
             hasil = data.slice(10,2000).map( (i)=>{ return [
