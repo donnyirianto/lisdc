@@ -19,7 +19,7 @@ const read = async (browser,kdcab,address,jenis)=>{
         await page.waitForSelector("select.selectpicker");
         await page.select('select.selectpicker', jenis);  
         await page.waitForSelector("#startdate"); 
-        await page.type("#startdate", `${dayjs().subtract(2, 'day').format("MM")}/${dayjs().subtract(2, 'day').format("DD")}/${dayjs().subtract(2, 'day').format("YYYY")} 00:00:00`);
+        await page.type("#startdate", `${dayjs().subtract(1, 'day').format("MM")}/${dayjs().subtract(1, 'day').format("DD")}/${dayjs().subtract(1, 'day').format("YYYY")} 00:00:00`);
         await page.waitForSelector("#enddate"); 
         await page.type("#enddate", `${dayjs().format("MM")}/${dayjs().format("DD")}/${dayjs().format("YYYY")} 23:59:59`);
         await page.click("input[type=submit]");

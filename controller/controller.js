@@ -18,7 +18,7 @@ const getServer = async (a,b) => {
     }
 }   
  
-const doitBro = async (browser,r,jenis) => { 
+const doitBro = async (browser,r) => { 
     
     const kdcab = r.dc_kode  
 	const page = await browser.newPage()
@@ -41,29 +41,35 @@ const doitBro = async (browser,r,jenis) => {
         
         await page.click("button[type=submit]");  
         await page.waitForTimeout(500)
-       
-        let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
-        if (!fs.existsSync(folder)) {
-            fs.mkdirSync(folder,{ recursive: true });
+        //,"NPX","NPV","NPL"
+        const listjenis = ["NPB","NPR","NPX","NPV","NPL"]
+        for(let jenis of listjenis){
+            let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
+            if (!fs.existsSync(folder)) {
+                fs.mkdirSync(folder,{ recursive: true });
+            }
+            const updatedata = await readData.read(browser,kdcab,r.address, jenis)
+            .then(async (r)=>{
+                if(r.status === "OK" && r.data.length > 0)
+                    
+                    await Models.insertData(r.data,kdcab,jenis,tgl_start,tgl_end)
+                return r.data.length
+            })
+            .catch((e)=>{
+                console.log(e)
+                return e
+            })
+            logger.info({
+            status: "OK",
+            msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
+        }) 
         }
-        const updatedata = await readData.read(browser,kdcab,r.address, jenis)
-        .then(async (r)=>{
-            if(r.status === "OK" && r.data.length > 0)
-                
-                await Models.insertData(r.data,kdcab,jenis,tgl_start,tgl_end)
-            return r.data.length
-        })
-        .catch((e)=>{return e})
              
         await page.close(); 
-
-        logger.info({
-            status: "OK",
-            msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
-        })
+        
         return {
             status: "OK",
-            msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
+            msg : `${kdcab} - Sukses Update Data`
         }
     } catch (error) {
         logger.warn({

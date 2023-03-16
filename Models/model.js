@@ -27,10 +27,10 @@ const insertData = async (data,dc,jenis,tgl_start,tgl_end) => {
         
         await conn.insert(  {sql: queryInsert, values: [data]}) 
 
-        console.log("Sukses Insert")
+        console.log(`Sukses Insert ${dc}-${jenis} : ${data.length} Rows`)
         return "Sukses"
     }catch(e){
-        console.log(e)
+        console.log(`"Gagal Insert ${dc}-${jenis} : ${e}`)
         return "Error"
     }
 }
