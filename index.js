@@ -37,8 +37,8 @@ const myPromise = async(a,b)=>{
   exec('kill -9 ' + pid, (error, stdout, stderr) => {});   
 } 
 
-//cron.schedule('*/30 * * * *', async() => { 
-( async() => {   
+cron.schedule('*/30 * * * *', async() => { 
+//( async() => {   
   if (taskRunning) { 
       taskRunning = false    
       try {  
@@ -71,6 +71,6 @@ const myPromise = async(a,b)=>{
       }
   }
 
-})();
+});
 
     

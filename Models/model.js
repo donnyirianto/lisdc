@@ -25,8 +25,8 @@ const insertData = async (data,dc,jenis,tgl_start,tgl_end) => {
 
         const queryInsert = `REPLACE INTO m_npdc (tanggal,dc,jenis,toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb,lastupd) values ?`
         
-        await conn.insert(  {sql: queryInsert, values: [data]}) 
-
+        const xx = await conn.insert(  {sql: queryInsert, values: [data]}) 
+        
         console.log(`Sukses Insert ${dc}-${jenis} : ${data.length} Rows`)
         return "Sukses"
     }catch(e){

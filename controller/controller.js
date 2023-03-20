@@ -41,7 +41,7 @@ const doitBro = async (browser,r) => {
         
         await page.click("button[type=submit]");  
         await page.waitForTimeout(500)
-        //,"NPX","NPV","NPL"
+        //
         const listjenis = ["NPB","NPR","NPX","NPV","NPL"]
         for(let jenis of listjenis){
             let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
