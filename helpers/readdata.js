@@ -4,9 +4,10 @@ const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 } 
 const read = async (browser,kdcab,address,jenis)=>{
-    try {        
-        const page = await browser.newPage()    
 
+    const page = await browser.newPage()  
+
+    try {         
         await page.setViewport({
             width: 1920, // replace with your desired width
             height: 1080, // replace with your desired height
@@ -36,7 +37,7 @@ const read = async (browser,kdcab,address,jenis)=>{
         await page.waitForSelector("a.ActiveLink");        
         const links = await page.$$('a.ActiveLink');
         await links[0].click()
-        await sleep(20000);  
+        await sleep(20000);
         // if(jenis =="NPB" || jenis =="NPR"){
         //     await page.waitForTimeout(10000);  
         // }else{
@@ -100,6 +101,8 @@ const read = async (browser,kdcab,address,jenis)=>{
             data: hasil
         }
     } catch (e) {
+        console.log(`Error Page - Raeddata : ${e}`)
+        await page.close(); 
         return {
             status: "NOK",
             data : `None`

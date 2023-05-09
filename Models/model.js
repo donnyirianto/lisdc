@@ -6,7 +6,7 @@ const dataServer = async (a,b) => {
        
         const rows = await conn.query(`
         SELECT dc_induk,dc_kode,jenis_dc,nama,ip,address,username,pass,reg FROM m_server_lis
-        order by dc_induk,dc_kode
+        order by dc_induk,dc_kode 
         limit ${a},${b};
         `)
         return rows

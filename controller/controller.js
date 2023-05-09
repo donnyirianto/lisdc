@@ -40,32 +40,71 @@ const doitBro = async (browser,r) => {
         await page.keyboard.type( `${r.pass}`);  
         
         await page.click("button[type=submit]");  
-        await page.waitForTimeout(500)
-        //
-        const listjenis = ["NPB","NPR","NPX","NPV","NPL"]
-        for(let jenis of listjenis){
-            let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
-            if (!fs.existsSync(folder)) {
-                fs.mkdirSync(folder,{ recursive: true });
-            }
-            const updatedata = await readData.read(browser,kdcab,r.address, jenis)
-            .then(async (r)=>{
-                if(r.status === "OK" && r.data.length > 0)
-                    
-                    await Models.insertData(r.data,kdcab,jenis,tgl_start,tgl_end)
-                return r.data.length
+        //await sleep(1000)
+        await page.waitForNavigation({ waitUntil: 'domcontentloaded' }); 
+
+        const links = await page.$$eval('a', elements =>
+            elements.map(el => el.textContent.trim())
+        );
+        //console.log(links)
+        if(links.length === 0){
+            logger.warn({
+                status: "NOK",
+                msg : `${kdcab} - Gagal Login ke Web LISDC / Meminta Reset Password`
             })
-            .catch((e)=>{
-                console.log(e)
-                return e
+            await page.waitForSelector("[name='newpassword']"); 
+            await page.type("[name='newpassword']", `2022@EDP`);
+            await page.keyboard.down("Tab");
+            await page.keyboard.type( `2022@EDP`);  
+            
+            await page.click("input[type=submit]"); 
+            await page.waitForSelector("[name='username']");  
+            logger.warn({
+                status: "NOK",
+                msg : `${kdcab} - Berhasil Update Password Password`
             })
-            logger.info({
-            status: "OK",
-            msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
-        }) 
+            // await sleep(1000)
+            //await page.waitForNavigation();
+
+            // await page.waitForSelector("[name='username']"); 
+            // await page.type("[name='username']", `${r.username}`);
+            // await page.keyboard.down("Tab");
+            // await page.keyboard.type( `${r.pass}`);  
+            
+            // await page.click("button[type=submit]");  
+            // await page.waitForSelector("a");
+        }else{
+            
+            //console.log("close disini")
+            //,"NPR","NPX","NPV","NPL"
+            const listjenis = ["NPB","NPR","NPX","NPV","NPL"]
+            for(let jenis of listjenis){
+                let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
+                if (!fs.existsSync(folder)) {
+                    fs.mkdirSync(folder,{ recursive: true });
+                }
+                const updatedata = await readData.read(browser,kdcab,r.address, jenis)
+                .then(async (r)=>{
+                    if(r.status === "OK" && r.data.length > 0)
+                        
+                        await Models.insertData(r.data,kdcab,jenis,tgl_start,tgl_end)
+                    return r.data.length
+                })
+                .catch((e)=>{
+                    console.log(e)
+                    return e
+                })
+                logger.info({
+                    status: "OK",
+                    msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
+                }) 
+            } 
+
+           
         }
-             
-        await page.close(); 
+        await page.close();   
+            
+            
         
         return {
             status: "OK",
@@ -76,7 +115,7 @@ const doitBro = async (browser,r) => {
             status: "NOK",
             msg : `${kdcab} - Gagal :: ${error}`
         })
-        await page.close();		
+        await page.close();
         return {
             status: "NOK",
             msg : `${kdcab} - Gagal :: ${error}`

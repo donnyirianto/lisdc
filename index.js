@@ -9,42 +9,48 @@ let taskRunning = true
 logger.info("[SERVICE START] Service Cek LISDC : " + dayjs().format("YYYY-MM-DD HH:mm:ss") );
 
 const myPromise = async(a,b)=>{
-
   const browser = await puppeteer.launch({headless : true, 
-            args: [ '--no-sandbox',
-            '--disable-gpu']
-          })
-          
+    args: [ '--no-sandbox',
+    '--disable-gpu']
+  })
   const pid = browser.process().pid;
 
-  const server = await Controller.getServer(a,b)  
- 
-  const allPromises = [];
+  try { 
+     
+    const server = await Controller.getServer(a,b)  
 
-  for (let r of server) {
+    const allPromises = [];
+
+    for (let r of server) {
+      //await Controller.doitBro(browser,r);
       const promise = new Promise(async (res, rej) => {
         Controller.doitBro(browser,r) 
           .then((val) => { res(val)})
           .catch((e) => { rej(e) })
       });
       allPromises.push(promise);
-  }; 
+    }; 
+
+    await Promise.allSettled(allPromises);
+
+    logger.info(`Job ${a}-${a+b} Done :: ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`)
+    await browser.close();
+    exec('kill -9 ' + pid, (error, stdout, stderr) => {});   
+  } catch (error) {
+    console.log(`Error myPromise ${a} - ${b} :: ${e}`)
+    await browser.close();
+    exec('kill -9 ' + pid, (error, stdout, stderr) => {});   
+  }
   
-  await Promise.allSettled(allPromises);
-  
-  logger.info(`Job ${a}-${a+b} Done :: ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`)
-  await browser.close();
-  exec('kill -9 ' + pid, (error, stdout, stderr) => {});   
 } 
 
-cron.schedule('*/30 * * * *', async() => { 
-//( async() => {   
+//cron.schedule('0 */1 * * *', async() => { 
+( async() => {   
   if (taskRunning) { 
       taskRunning = false    
       try {  
 		      taskRunning = false                        
           logger.info("Memulai Menjalankan Pengecekan LISDC NPB:: " +  dayjs().format("YYYY-MM-DD HH:mm:ss"))
-          
           await myPromise(0,10)
           await myPromise(10,10)
           await myPromise(20,10)
@@ -59,9 +65,8 @@ cron.schedule('*/30 * * * *', async() => {
           await myPromise(110,10)
           await myPromise(120,10)
           await myPromise(130,10)
-          await myPromise(140,10)
-          await myPromise(150,10)
-          await myPromise(160,10) 
+          await myPromise(140,10) 
+          await myPromise(150,10) 
                       
           logger.info("[END] Pengecekan LISDC NPB: " +  dayjs().format("YYYY-MM-DD HH:mm:ss") )
           taskRunning = true
@@ -71,6 +76,6 @@ cron.schedule('*/30 * * * *', async() => {
       }
   }
 
-});
+})();
 
     
