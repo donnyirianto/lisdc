@@ -23,8 +23,7 @@ const doitBro = async (browser,r) => {
     const kdcab = r.dc_kode  
 	const page = await browser.newPage()
     try {   
-        const tgl_start = dayjs().subtract(2, 'day').format("YYYY-MM-DD")
-        const tgl_end = dayjs().format("YYYY-MM-DD")
+        
         await page.setViewport({
             width: 1920, // replace with your desired width
             height: 1080, // replace with your desired height
@@ -40,44 +39,42 @@ const doitBro = async (browser,r) => {
         await page.keyboard.type( `${r.pass}`);  
         
         await page.click("button[type=submit]");  
-        //await sleep(1000)
-        await page.waitForNavigation({ waitUntil: 'domcontentloaded' }); 
+        await sleep(3000)
+        //await page.waitForNavigation({ waitUntil: 'networkidle0' }); 
+        
+        // const links = await page.$$eval('a', elements =>
+        //     elements.map(el => el.textContent.trim())
+        // );
 
-        const links = await page.$$eval('a', elements =>
-            elements.map(el => el.textContent.trim())
-        );
-        //console.log(links)
-        if(links.length === 0){
-            logger.warn({
-                status: "NOK",
-                msg : `${kdcab} - Gagal Login ke Web LISDC / Meminta Reset Password`
-            })
-            await page.waitForSelector("[name='newpassword']"); 
-            await page.type("[name='newpassword']", `2022@EDP`);
-            await page.keyboard.down("Tab");
-            await page.keyboard.type( `2022@EDP`);  
-            
-            await page.click("input[type=submit]"); 
-            await page.waitForSelector("[name='username']");  
-            logger.warn({
-                status: "NOK",
-                msg : `${kdcab} - Berhasil Update Password Password`
-            })
-            // await sleep(1000)
-            //await page.waitForNavigation();
+        // console.log(links)
 
-            // await page.waitForSelector("[name='username']"); 
-            // await page.type("[name='username']", `${r.username}`);
-            // await page.keyboard.down("Tab");
-            // await page.keyboard.type( `${r.pass}`);  
+        // if(links.length === 0){
+        //     logger.warn({
+        //         status: "NOK",
+        //         msg : `${kdcab} - Gagal Login ke Web LISDC / Meminta Reset Password`
+        //     })
+        //     await page.waitForSelector("[name='newpassword']"); 
+        //     await page.type("[name='newpassword']", `2022@EDP`);
+        //     await page.keyboard.down("Tab");
+        //     await page.keyboard.type( `2022@EDP`);  
             
-            // await page.click("button[type=submit]");  
-            // await page.waitForSelector("a");
-        }else{
+        //     await page.click("input[type=submit]"); 
+        //     await sleep(3000)
+        //     //await page.waitForSelector("[name='username']");  
+        //     logger.warn({
+        //         status: "NOK",
+        //         msg : `${kdcab} - Berhasil Update Password Password`
+        //     })
+        //     await page.waitForSelector("[name='username']"); 
+        //     await page.type("[name='username']", `${r.username}`);
+        //     await page.keyboard.down("Tab");
+        //     await page.keyboard.type( `${r.pass}`);  
             
-            //console.log("close disini")
-            //,"NPR","NPX","NPV","NPL"
-            const listjenis = ["NPB","NPR","NPX","NPV","NPL"]
+        //     await page.click("button[type=submit]");  
+        //     await page.waitForSelector("a");
+        // }
+        // else{ 
+            const listjenis = ["NPB","NPR","NPX","NPV","NPL"] 
             for(let jenis of listjenis){
                 let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
                 if (!fs.existsSync(folder)) {
@@ -86,8 +83,7 @@ const doitBro = async (browser,r) => {
                 const updatedata = await readData.read(browser,kdcab,r.address, jenis)
                 .then(async (r)=>{
                     if(r.status === "OK" && r.data.length > 0)
-                        
-                        await Models.insertData(r.data,kdcab,jenis,tgl_start,tgl_end)
+                        await Models.insertData(r.data,kdcab,jenis)
                     return r.data.length
                 })
                 .catch((e)=>{
@@ -101,11 +97,8 @@ const doitBro = async (browser,r) => {
             } 
 
            
-        }
-        await page.close();   
-            
-            
-        
+        // }
+        await page.close();
         return {
             status: "OK",
             msg : `${kdcab} - Sukses Update Data`
@@ -115,7 +108,7 @@ const doitBro = async (browser,r) => {
             status: "NOK",
             msg : `${kdcab} - Gagal :: ${error}`
         })
-        await page.close();
+        
         return {
             status: "NOK",
             msg : `${kdcab} - Gagal :: ${error}`

@@ -1,8 +1,30 @@
 const dayjs = require("dayjs");
 const XLSX = require('xlsx'); 
+const fs = require('fs');
+
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 } 
+async function waitFile (filename) {
+
+    return new Promise(async (resolve, reject) => {
+        if (!fs.existsSync(filename)) {
+            await delay(3000);    
+            await waitFile(filename);
+            resolve();
+        }else{
+          resolve();
+        }
+
+    })   
+}
+
+function delay(time) {
+    return new Promise(function(resolve) { 
+        setTimeout(resolve, time)
+    });
+}
+
 const read = async (browser,kdcab,address,jenis)=>{
 
     const page = await browser.newPage()  
@@ -20,11 +42,11 @@ const read = async (browser,kdcab,address,jenis)=>{
         await page.waitForSelector("select.selectpicker");
         await page.select('select.selectpicker', jenis);  
         await page.waitForSelector("#startdate"); 
-        await page.type("#startdate", `${dayjs().subtract(1, 'day').format("MM")}/${dayjs().subtract(1, 'day').format("DD")}/${dayjs().subtract(1, 'day').format("YYYY")} 00:00:00`);
+        await page.type("#startdate", `${dayjs().subtract(2, 'day').format("MM")}/${dayjs().subtract(2, 'day').format("DD")}/${dayjs().subtract(2, 'day').format("YYYY")} 00:00:00`);
         await page.waitForSelector("#enddate"); 
         await page.type("#enddate", `${dayjs().format("MM")}/${dayjs().format("DD")}/${dayjs().format("YYYY")} 23:59:59`);
         await page.click("input[type=submit]");
-        await page.waitForTimeout(200)
+        await page.waitForTimeout(5000)
         await page.goto(`http://${address}/ReportViewerWebForm.aspx`,
         {    
             waitUntil: 'networkidle0'
@@ -37,16 +59,20 @@ const read = async (browser,kdcab,address,jenis)=>{
         await page.waitForSelector("a.ActiveLink");        
         const links = await page.$$('a.ActiveLink');
         await links[0].click()
-        await sleep(20000);
+        
+        const newPath = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/LapMonitorTransDataWebS.xlsx`;
+        await page.waitForTimeout(20000)
+        //await waitFile(newPath);
         // if(jenis =="NPB" || jenis =="NPR"){
         //     await page.waitForTimeout(10000);  
         // }else{
         //     await page.waitForTimeout(5000);  
         // }
         
-        const newPath = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/LapMonitorTransDataWebS.xlsx`;
+        
         
         await page.close(); 
+
         const workbook = XLSX.readFile(newPath);
         const sheetNames = workbook.SheetNames;
         const worksheet = workbook.Sheets[sheetNames[0]];
@@ -101,8 +127,7 @@ const read = async (browser,kdcab,address,jenis)=>{
             data: hasil
         }
     } catch (e) {
-        console.log(`Error Page - Raeddata : ${e}`)
-        await page.close(); 
+        console.log(`Error Page - Read data : ${e}`)
         return {
             status: "NOK",
             data : `None`

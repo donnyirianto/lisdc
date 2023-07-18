@@ -4,13 +4,24 @@ const config = require('../config');
 const conn =  mysql.createPool(config.db); 
 
 async function query(query, param) {
-  const [result] = await conn.query(query, param)
+  try {
+    const [result] = await conn.query(query, param)
 
-  return result
+    return result  
+  } catch (e) {
+    console.log(e)
+  }
+  
 }
 async function insert(query) {
-  const result = await conn.query(query)
-  return result
+  try {
+    const result = await conn.query(query)
+    
+    return result  
+  } catch (e) {
+    console.log(e)
+  }
+  
 }
 
 module.exports = {

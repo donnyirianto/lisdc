@@ -15,7 +15,7 @@ const dataServer = async (a,b) => {
     }
 } 
  
-const insertData = async (data,dc,jenis,tgl_start,tgl_end) => {
+const insertData = async (data,dc,jenis) => {
     try{
     	/*
         await conn.insert(`Delete from m_npdc where dc='${dc}' and 
@@ -25,7 +25,7 @@ const insertData = async (data,dc,jenis,tgl_start,tgl_end) => {
 
         const queryInsert = `REPLACE INTO m_npdc (tanggal,dc,jenis,toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb,lastupd) values ?`
         
-        const xx = await conn.insert(  {sql: queryInsert, values: [data]}) 
+        await conn.insert(  {sql: queryInsert, values: [data]}) 
         
         console.log(`Sukses Insert ${dc}-${jenis} : ${data.length} Rows`)
         return "Sukses"
