@@ -42,7 +42,7 @@ const updateRekap = async (data,jenis,tgl_start,tgl_end) => {
         console.log("Sukses Insert")
         return "Sukses"
     }catch(e){
-        console.log(e)
+        
         return "Error"
     }
 }

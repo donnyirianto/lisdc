@@ -38,7 +38,6 @@ const read = async (browser,kdcab,address,jenis)=>{
         {    
             waitUntil: 'networkidle2'
         });
-        await page.waitForTimeout(200)
         await page.waitForSelector("select.selectpicker");
         await page.select('select.selectpicker', jenis);  
         await page.waitForSelector("#startdate"); 
@@ -46,11 +45,13 @@ const read = async (browser,kdcab,address,jenis)=>{
         await page.waitForSelector("#enddate"); 
         await page.type("#enddate", `${dayjs().format("MM")}/${dayjs().format("DD")}/${dayjs().format("YYYY")} 23:59:59`);
         await page.click("input[type=submit]");
-        await page.waitForTimeout(5000)
+        await page.waitForTimeout(3000)
+        
         await page.goto(`http://${address}/ReportViewerWebForm.aspx`,
         {    
             waitUntil: 'networkidle0'
         });
+
         await page._client().send('Page.setDownloadBehavior', {
             behavior: 'allow',
             downloadPath: `./downloads/${kdcab}/${jenis}`,
@@ -61,16 +62,9 @@ const read = async (browser,kdcab,address,jenis)=>{
         await links[0].click()
         
         const newPath = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/LapMonitorTransDataWebS.xlsx`;
-        await page.waitForTimeout(20000)
-        //await waitFile(newPath);
-        // if(jenis =="NPB" || jenis =="NPR"){
-        //     await page.waitForTimeout(10000);  
-        // }else{
-        //     await page.waitForTimeout(5000);  
-        // }
         
-        
-        
+        await sleep(20000) 
+
         await page.close(); 
 
         const workbook = XLSX.readFile(newPath);
@@ -127,11 +121,10 @@ const read = async (browser,kdcab,address,jenis)=>{
             data: hasil
         }
     } catch (e) {
-        console.log(`Error Page - Read data : ${e}`)
-        return {
-            status: "NOK",
-            data : `None`
-        }
+        
+        throw e
+        
+        
     }
     
 }

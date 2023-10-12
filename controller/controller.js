@@ -74,7 +74,7 @@ const doitBro = async (browser,r) => {
         //     await page.waitForSelector("a");
         // }
         // else{ 
-            const listjenis = ["NPB","NPR","NPX","NPV","NPL"] 
+            const listjenis = ["NPB","NPR","NPT","NPX","NPV","NPL"] 
             for(let jenis of listjenis){
                 let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
                 if (!fs.existsSync(folder)) {
@@ -87,7 +87,7 @@ const doitBro = async (browser,r) => {
                     return r.data.length
                 })
                 .catch((e)=>{
-                    console.log(e)
+                    
                     return e
                 })
                 logger.info({
@@ -104,6 +104,7 @@ const doitBro = async (browser,r) => {
             msg : `${kdcab} - Sukses Update Data`
         }
     } catch (error) {
+        await page.close();
         logger.warn({
             status: "NOK",
             msg : `${kdcab} - Gagal :: ${error}`
@@ -120,7 +121,7 @@ const updateRekap = async () => {
     try {
         await Models.updateRekap()
     } catch (e) {
-        console.log(e)   
+           
         return "error"
     }
 }
