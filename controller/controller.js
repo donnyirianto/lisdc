@@ -73,7 +73,8 @@ const doitBro = async (browser,r) => {
         //     await page.click("button[type=submit]");  
         //     await page.waitForSelector("a");
         // }
-        // else{ 
+        // // else{ 
+        //     //"NPB","NPR","NPT","NPX","NPV","NPL"
             const listjenis = ["NPB","NPR","NPT","NPX","NPV","NPL"] 
             for(let jenis of listjenis){
                 let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
@@ -95,9 +96,8 @@ const doitBro = async (browser,r) => {
                     msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
                 }) 
             } 
-
-           
-        // }
+ 
+        // // }
         await page.close();
         return {
             status: "OK",
