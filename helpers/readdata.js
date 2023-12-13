@@ -38,15 +38,23 @@ const read = async (browser,kdcab,address,jenis)=>{
         {    
             waitUntil: 'networkidle2'
         });
-        await page.waitForSelector("select.selectpicker");
+        
+        await page.waitForSelector("select.selectpicker"); 
         await page.select('select.selectpicker', jenis);  
         await page.waitForSelector("#startdate"); 
         await page.type("#startdate", `${dayjs().subtract(2, 'day').format("MM")}/${dayjs().subtract(2, 'day').format("DD")}/${dayjs().subtract(2, 'day').format("YYYY")} 00:00:00`);
         await page.waitForSelector("#enddate"); 
         await page.type("#enddate", `${dayjs().format("MM")}/${dayjs().format("DD")}/${dayjs().format("YYYY")} 23:59:59`);
-        await page.click("input[type=submit]");
-        await page.waitForTimeout(3000)
         
+        await page.evaluate(() => {
+            var radioButtonAll = document.querySelector("#rbAll")
+            if(radioButtonAll){
+                radioButtonAll.click();
+            } 
+         })
+        
+        await page.click("input[type=submit]");        
+        await page.waitForTimeout(3000)
         await page.goto(`http://${address}/ReportViewerWebForm.aspx`,
         {    
             waitUntil: 'networkidle0'
@@ -54,8 +62,9 @@ const read = async (browser,kdcab,address,jenis)=>{
 
         await page._client().send('Page.setDownloadBehavior', {
             behavior: 'allow',
-            downloadPath: `./downloads/${kdcab}/${jenis}`,
+            downloadPath: `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}`,
         })
+        
         await page.click("#ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown");
         await page.waitForSelector("a.ActiveLink");        
         const links = await page.$$('a.ActiveLink');
@@ -120,11 +129,8 @@ const read = async (browser,kdcab,address,jenis)=>{
             status: "OK",
             data: hasil
         }
-    } catch (e) {
-        
-        throw e
-        
-        
+    } catch (e) { 
+        throw e  
     }
     
 }

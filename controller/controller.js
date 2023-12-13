@@ -21,6 +21,7 @@ const getServer = async (a,b) => {
 const doitBro = async (browser,r) => { 
     
     const kdcab = r.dc_kode  
+    console.log(kdcab)
 	const page = await browser.newPage()
     try {   
         
@@ -40,7 +41,7 @@ const doitBro = async (browser,r) => {
         
         await page.click("button[type=submit]");  
         await sleep(3000)
-        //await page.waitForNavigation({ waitUntil: 'networkidle0' }); 
+        //await page.waitForNavigation({ waitUntil: 'networkidle0' });
         
         // const links = await page.$$eval('a', elements =>
         //     elements.map(el => el.textContent.trim())
@@ -75,27 +76,28 @@ const doitBro = async (browser,r) => {
         // }
         // // else{ 
         //     //"NPB","NPR","NPT","NPX","NPV","NPL"
-            const listjenis = ["NPB","NPR","NPT","NPX","NPV","NPL"] 
-            for(let jenis of listjenis){
-                let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
-                if (!fs.existsSync(folder)) {
-                    fs.mkdirSync(folder,{ recursive: true });
-                }
-                const updatedata = await readData.read(browser,kdcab,r.address, jenis)
-                .then(async (r)=>{
-                    if(r.status === "OK" && r.data.length > 0)
-                        await Models.insertData(r.data,kdcab,jenis)
-                    return r.data.length
-                })
-                .catch((e)=>{
-                    
-                    return e
-                })
-                logger.info({
-                    status: "OK",
-                    msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
-                }) 
-            } 
+        //,
+        const listjenis = ["NPB","NPR","NPT","NPX","NPV","NPL"]
+        for(let jenis of listjenis){
+            let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
+            if (!fs.existsSync(folder)) {
+                fs.mkdirSync(folder,{ recursive: true });
+            }
+            const updatedata = await readData.read(browser,kdcab,r.address, jenis)
+            .then(async (r)=>{
+                if(r.status === "OK" && r.data.length > 0)
+                    await Models.insertData(r.data,kdcab,jenis)
+                return r.data.length
+            })
+            .catch((e)=>{
+                
+                return e
+            })
+            logger.info({
+                status: "OK",
+                msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
+            }) 
+        } 
  
         // // }
         await page.close();
