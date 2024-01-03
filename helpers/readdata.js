@@ -64,7 +64,7 @@ const read = async (browser,kdcab,address,jenis)=>{
             behavior: 'allow',
             downloadPath: `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}`,
         })
-        
+        await page.waitForSelector("#ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown");       
         await page.click("#ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown");
         await page.waitForSelector("a.ActiveLink");        
         const links = await page.$$('a.ActiveLink');
@@ -130,6 +130,7 @@ const read = async (browser,kdcab,address,jenis)=>{
             data: hasil
         }
     } catch (e) { 
+        await page.close(); 
         throw e  
     }
     

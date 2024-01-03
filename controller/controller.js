@@ -41,13 +41,11 @@ const doitBro = async (browser,r) => {
         
         await page.click("button[type=submit]");  
         await sleep(3000)
-        //await page.waitForNavigation({ waitUntil: 'networkidle0' });
+        //Sini
         
         // const links = await page.$$eval('a', elements =>
         //     elements.map(el => el.textContent.trim())
         // );
-
-        // console.log(links)
 
         // if(links.length === 0){
         //     logger.warn({
@@ -74,9 +72,9 @@ const doitBro = async (browser,r) => {
         //     await page.click("button[type=submit]");  
         //     await page.waitForSelector("a");
         // }
-        // // else{ 
-        //     //"NPB","NPR","NPT","NPX","NPV","NPL"
-        //,
+        // // // else{ 
+        // //     //"NPB","NPR","NPT","NPX","NPV","NPL"
+        // //,
         const listjenis = ["NPB","NPR","NPT","NPX","NPV","NPL"]
         for(let jenis of listjenis){
             let folder = `/home/donny/project/lisdc/downloads/${kdcab}/${jenis}/`
@@ -97,7 +95,7 @@ const doitBro = async (browser,r) => {
                 status: "OK",
                 msg : `${kdcab} - Sukses Update Data ${jenis}: ${updatedata} Rows`
             }) 
-        } 
+        }
  
         // // }
         await page.close();

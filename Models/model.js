@@ -1,9 +1,8 @@
-const conn = require('../services/db'); 
- 
+const conn = require('../services/db2');  
 
 const dataServer = async (a,b) => {
     try{
-       
+        
         const rows = await conn.query(`
         SELECT dc_induk,dc_kode,jenis_dc,nama,ip,address,username,pass,reg FROM m_server_lis
         order by dc_induk,dc_kode 
@@ -24,7 +23,7 @@ const insertData = async (data,dc,jenis) => {
         */
         const queryInsert = `REPLACE INTO m_npdc (tanggal,dc,jenis,toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb,lastupd) values ?`
         
-        await conn.insert(  {sql: queryInsert, values: [data]}) 
+        await conn.insert({sql: queryInsert, values: [data]})
         
         console.log(`Sukses Insert ${dc}-${jenis} : ${data.length} Rows`)
         return "Sukses"
