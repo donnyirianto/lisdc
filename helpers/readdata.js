@@ -99,6 +99,7 @@ const read = async (browser,kdcab,address,jenis)=>{
                 i.__EMPTY_20,
                 i.__EMPTY_21,
                 i.__EMPTY_22,
+                i.__EMPTY_24,
                 dayjs().format("YYYY-MM-DD HH:mm:ss")
             ] })
                  
@@ -120,6 +121,7 @@ const read = async (browser,kdcab,address,jenis)=>{
                 '',
                 '',
                 i.__EMPTY_19,
+                i.__EMPTY_21,
                 dayjs().format("YYYY-MM-DD HH:mm:ss")
             ] })
                  

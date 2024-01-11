@@ -9,7 +9,7 @@ let taskRunning = true
 logger.info("[SERVICE START] Service Cek LISDC : " + dayjs().format("YYYY-MM-DD HH:mm:ss") );
 
 const myPromise = async(a,b)=>{
-  const browser = await puppeteer.launch({headless : true, 
+  const browser = await puppeteer.launch({headless : false, 
     args: [ '--no-sandbox','--disable-gpu']
   })
   const pid = browser.process().pid;
@@ -50,7 +50,7 @@ const myPromise = async(a,b)=>{
 		      taskRunning = false                        
           logger.info("Memulai Menjalankan Pengecekan LISDC NPB:: " +  dayjs().format("YYYY-MM-DD HH:mm:ss"))
           
-          for (let i = 0; i <= 160; i += 5) {
+          for (let i = 0; i <= 170; i += 5) {
             await myPromise(i, 5)
           }
                       

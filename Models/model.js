@@ -5,6 +5,7 @@ const dataServer = async (a,b) => {
         
         const rows = await conn.query(`
         SELECT dc_induk,dc_kode,jenis_dc,nama,ip,address,username,pass,reg FROM m_server_lis
+        where dc_kode = 'G004'
         order by dc_induk,dc_kode 
         limit ${a},${b};
         `)
@@ -21,7 +22,7 @@ const insertData = async (data,dc,jenis) => {
         jenis='${jenis}' 
         and STR_TO_DATE(tanggal,'%d-%m-%Y') between '${tgl_start}' and '${tgl_end}';`)
         */
-        const queryInsert = `REPLACE INTO m_npdc (tanggal,dc,jenis,toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb,lastupd) values ?`
+        const queryInsert = `REPLACE INTO m_npdc (tanggal,dc,jenis,toko,namaToko,namafile,jamWeb,jamCsv,jamKirim,jamKonfirm,jamToko,docno,jmlItem,jamBpb,bukti_no,jmlBpb,retry,lastupd) values ?`
         
         await conn.insert({sql: queryInsert, values: [data]})
         
