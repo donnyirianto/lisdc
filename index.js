@@ -9,7 +9,7 @@ let taskRunning = true
 logger.info("[SERVICE START] Service Cek LISDC : " + dayjs().format("YYYY-MM-DD HH:mm:ss") );
 
 const myPromise = async(a,b)=>{
-  const browser = await puppeteer.launch({headless : false, 
+  const browser = await puppeteer.launch({headless : true, 
     args: [ '--no-sandbox','--disable-gpu']
   })
   const pid = browser.process().pid;
